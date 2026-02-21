@@ -259,17 +259,17 @@ my %default_config = (
 	menuFont => 'Helvetica -12',
 	balloonFont => 'Helvetica -12',
 	balloonWait => 350, # in milliseconds
-	balloonBG => '#C0C080',
-	balloonMsg => 'Tab %tabNo:\n%iconText\n%title',
-	autoResize => 'false',
+	balloonBG => '#cdcdff',
+	balloonMsg => 'Tab %tabNo:\n%iconText',
+	autoResize => 'true',
 	stateFile => _fvwmtabs_statefile_path(),
 	fixedSizeTabs => 'false',
-	showTitlebar => 'true',
+	showTitlebar => 'false',
 	useTMTitlebar => 'true',
 	clickToFocus => 'true',
 	dragDropIcon => 'none',
 	bBuggyFocus => 'false',
-	enableSwallowDND => 'true',
+	enableSwallowDND => 'false',
 	swallowDNDTolerance => 10, # pixels
 	useIconsOnTabs => 'true',
 	killIcon => 'none',
@@ -616,7 +616,7 @@ sub showMenu ($$)
 					   -label => 'Menu Font',
 					   -command => [\&selectFont, $tId, 'menu']);
 
-		$menu->add('cascade', -label => 'Font', -menu => $fontMenu);
+# EDIT		$menu->add('cascade', -label => 'Font', -menu => $fontMenu);
 	}
 	if (!defined $tabWin{$tId}{optionsMenu})
 	{
