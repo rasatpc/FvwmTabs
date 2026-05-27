@@ -1,12 +1,19 @@
-# FvwmTabs v12 FVWM command definitions.
-# Load this file with legacy Read or through the FvwmTabs module launcher.
-# This file does not edit the user's StartFunction.
-SetEnv FVWMTABS_DIR $[FVWM_USERDIR]/FvwmTabs
+# FvwmTabs v12 FVWM functions
+# FVWMTABS_DIR is set by the FvwmTabs module from its actual ModulePath.
 SetEnv FVWMTABS_DEFAULT_ID 1
 
 DestroyFunc FvwmTabsStart
 AddToFunc FvwmTabsStart
 + I Exec exec python3 "$[FVWMTABS_DIR]/tabber_client.py" start
+
+DestroyFunc FvwmTabsShutdownHook
+AddToFunc FvwmTabsShutdownHook
++ I Test (ToRestart) PipeRead 'python3 "$[FVWMTABS_DIR]/FvwmTabs" --fvwm-shutdown restart' quiet
++ I Test (Quit) PipeRead 'python3 "$[FVWMTABS_DIR]/FvwmTabs" --fvwm-shutdown quit' quiet
++ I Test (Quit) Exec exec python3 "$[FVWMTABS_DIR]/tabber_client.py" quit
+
+AddToFunc ExitFunction
++ I Function FvwmTabsShutdownHook
 
 DestroyFunc NewTabber
 AddToFunc NewTabber
@@ -99,4 +106,4 @@ Key Right A CM Function NextTab
 Key Left A CM Function PrevTab
 
 # Optional root-window menu binding (comment out if you already use right-click root menus)
-Mouse 3 R A Menu TabbersMenu
+Mouse 3 R A Menu TabbersMenu mouse 0p 0p

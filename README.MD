@@ -22,6 +22,5 @@ DestroyFunc StartFunction
 AddToFunc StartFunction
 + I Test (Init) InitBackground
 + I Module FvwmEvent EventNewDesk
-+ I Module FvwmMFL
 + I ModulePath ${HOME}/.fvwm/FvwmTabs:+
 + I Module FvwmTabs
