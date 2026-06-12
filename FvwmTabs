@@ -308,6 +308,62 @@ def _get_window_geometry(win_id):
         return None, None
 
 
+def _get_frame_top_extent(win_id):
+    # Read _NET_FRAME_EXTENTS (left, right, top, bottom) and return top (the
+    # WM titlebar height). Returns 0 if the property is absent or unreadable.
+    try:
+        out = _run_capture(
+            ["xprop", "-id", str(win_id), "_NET_FRAME_EXTENTS"],
+            timeout=XDO_COMMAND_TIMEOUT,
+        )
+    except Exception:
+        return 0
+    for line in out.splitlines():
+        if "_NET_FRAME_EXTENTS" not in line or "=" not in line:
+            continue
+        lowered = line.lower()
+        if "not found" in lowered or "no such atom" in lowered:
+            return 0
+        try:
+            parts = [int(p.strip()) for p in line.split("=", 1)[1].split(",")]
+            # EWMH order: left, right, top, bottom
+            if len(parts) >= 3:
+                return max(0, parts[2])
+        except Exception:
+            return 0
+    return 0
+
+
+def _get_window_geometry_string(win_id):
+    # Build a Tk geometry string ("WxH+X+Y") from a window's live X11 geometry.
+    # Used to seed an auto-created tabber with its target window's position so
+    # Fvwm does not place the geometry-less tabber at a default location and let
+    # it visibly jump before the window is swallowed. Returns None when the
+    # geometry cannot be read so callers fall back to the default placement.
+    try:
+        out = _run_capture(["xdotool", "getwindowgeometry", "--shell", str(win_id)], timeout=XDO_COMMAND_TIMEOUT)
+        data = {}
+        for line in out.splitlines():
+            if "=" in line:
+                key, value = line.strip().split("=", 1)
+                data[key] = value
+        width = int(data["WIDTH"])
+        height = int(data["HEIGHT"])
+        x = int(data["X"])
+        y = int(data["Y"])
+    except Exception:
+        return None
+    if width <= 0 or height <= 0:
+        return None
+    # xdotool reports Y from the client area; Fvwm places the tabber frame
+    # (including titlebar) at that Y, so subtract the WM top decoration height
+    # so the tabber appears exactly where the target window's client area began.
+    y -= _get_frame_top_extent(win_id)
+    # The :+d sign keeps off-screen (negative) offsets valid as Tk geometry,
+    # e.g. "1241x752+100+50" or "1241x752-5+50".
+    return f"{width}x{height}{x:+d}{y:+d}"
+
+
 def _xprop_key(raw):
     head = raw.split("=", 1)[0].split(":", 1)[0].strip()
     return head.split("(", 1)[0].strip()
@@ -2027,7 +2083,19 @@ class FvwmTabsServer:
     def _route_window_to_tabber(self, tabber_id, win_id, title=None, source="manual", create_missing=True):
         # Manual add and autoSwallow both converge here so every tab follows the
         # same storage, release, kill, and destroy path.
-        tabber = self._get_tabber(tabber_id, source=source, create_missing=create_missing)
+        #
+        # When this call will auto-create the target tabber, seed it with the
+        # target window's current geometry. A geometry-less tabber is placed by
+        # Fvwm at a default position and visibly jumps before we can swallow the
+        # window. Only read geometry when creating a brand-new tabber so existing
+        # tabbers are never moved out from under the user; fall back to default
+        # placement if the geometry cannot be read.
+        create_geometry = None
+        if create_missing and not self._tabber_exists(tabber_id):
+            create_geometry = _get_window_geometry_string(win_id)
+        tabber = self._get_tabber(
+            tabber_id, geometry=create_geometry, source=source, create_missing=create_missing
+        )
         if tabber is None:
             return False
         self._release_window_from_other_tabber(win_id, skip_id=tabber.tabber_id)
