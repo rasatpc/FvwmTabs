@@ -20,7 +20,5 @@ On Debian, Ubuntu, and MX Linux:
 
 DestroyFunc StartFunction
 AddToFunc StartFunction
-+ I Test (Init) InitBackground
-+ I Module FvwmEvent EventNewDesk
 + I ModulePath ${HOME}/.fvwm/FvwmTabs:+
 + I Module FvwmTabs
