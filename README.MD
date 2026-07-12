@@ -20,5 +20,6 @@ On Debian, Ubuntu, and MX Linux:
 
 DestroyFunc StartFunction
 AddToFunc StartFunction
++ I Module FvwmMFL
 + I ModulePath ${HOME}/.fvwm/FvwmTabs:+
 + I Module FvwmTabs

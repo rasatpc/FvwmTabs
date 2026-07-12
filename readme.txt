@@ -1,13 +1,11 @@
 FvwmTabs is a Python/Tk rewrite of the old Perl FVWM tabbing module. This keeps the socket/Tk design, multiple tabbers, FVWM command functions, assigned tabber IDs, right-click menu, and autoSwallow behavior.
 
-The FVWM module is a single executable file:
+The FVWM module is a executable file:
 
   FvwmTabs
 
-FvwmTabs is a single self-contained executable. There are no helper files.
-FVWM functions talk to FvwmTabs through the standard FvwmMFL module (see
-"Command routing" below), and the FvwmMFL socket client is built into FvwmTabs
-itself.
+FvwmTabs is a single self-contained executable file. FVWM functions talk to FvwmTabs through the standard FvwmMFL module (see
+"Command routing" below), and the FvwmMFL socket client is built into FvwmTabs itself.
 
 Requirements:
 
@@ -48,21 +46,23 @@ Install
 
 FVWM starts the executable named FvwmTabs from ModulePath. During module startup, FvwmTabs reads ConfigFvwmTabs, launches its own Python/Tk server, connects to the FvwmMFL socket, and stays connected to FVWM until FVWM exits.
 
-Note: FvwmTabs does not start FvwmMFL for you - load "Module FvwmMFL" yourself,
-before "Module FvwmTabs", as shown above.
+Note: FvwmTabs does not start FvwmMFL for you - load "Module FvwmMFL" yourself, before "Module FvwmTabs", as shown above.
 
 #####
 Manual Startup
+#####
 
 - FvwmConsole:
 
+Module FvwmMFL
 ModulePath ${HOME}/.fvwm/FvwmTabs:+
 Module FvwmTabs
 
 Create Tabbers:
 
 - Key binding: Ctrl+Meta+T
-- Tabber drop-down menu, select: "Add Tabber"
+  Tabber drop-down menu, select: "Add Tabber"
+  
 - FvwmConsole:
 
    NewTabber
@@ -73,10 +73,11 @@ Create Tabbers:
 
 The first new tabber is ID 1, the second is ID 2, then ID 3, and so on.
 
-Add Windows Manually
+Add Windows manually
 
 - Key binding: Ctrl+Meta+W, then click windows to add them to tabber 1.
 - Tabber drop-down menu, select: "Add Window(s)".
+
 - FvwmConsole:
 
   Tabize
@@ -111,11 +112,7 @@ Explicit tabber ID (FvwmConsole):
 
 Change a Tabber's ID:
 
-A tabber is identified by a numeric ID, and autoSwallow rules in FvwmTabs.conf
-are bound to those IDs (for example "firefox 2" sends Firefox windows to tabber
-ID 2). "Changing a tabber's ID" means reassigning that number - it is NOT a
-free-text label. Because the ID is what every by-ID command and every
-autoSwallow rule reads, reassigning it takes effect immediately:
+A tabber is identified by a numeric ID, and autoSwallow rules in FvwmTabs.conf are bound to those IDs (for example "firefox 2" sends Firefox windows to tabber ID 2). "Changing a tabber's ID" means reassigning that number - it is NOT a free-text label. Because the ID is what every by-ID command and every autoSwallow rule reads, reassigning it takes effect immediately:
 
   - NextTabId, PrevTabId, DestroyTabberId, and TabizeTo work with the new ID at
     once - no restart needed.
@@ -123,8 +120,7 @@ autoSwallow rule reads, reassigning it takes effect immediately:
     swallowed into this tabber right away, exactly as if the tabber had been
     created with that ID from the start.
 
-A new ID that is already in use by another tabber is REFUSED: an error dialog
-appears and nothing changes. Two tabbers can never share an ID.
+A new ID that is already in use by another tabber is REFUSED: an error dialog appears and nothing changes. Two tabbers can never share an ID.
 
 - Tabber drop-down menu (the "v" button), select: "Change Tabber ID". A small
   dialog appears; type the new ID number and press OK.
@@ -186,10 +182,7 @@ The chain is:
       -> FvwmMFL re-emits it as {"echo": {"message": "FvwmTabsCmd <command>"}}
       -> FvwmTabs server (subscribed to "echo") strips the tag and runs <command>.
 
-The same FvwmMFL connection also carries autoSwallow window events. Because the
-server dispatches whatever command follows the tag, adding a new command later
-needs only a new "Echo FvwmTabsCmd <command>" line in ConfigFvwmTabs - no change
-to FvwmTabs.
+The same FvwmMFL connection also carries autoSwallow window events. Because the server dispatches whatever command follows the tag, adding a new command later needs only a new "Echo FvwmTabsCmd <command>" line in ConfigFvwmTabs - no change to FvwmTabs.
 
 Socket discovery (usually automatic):
 
@@ -202,11 +195,8 @@ Environment variables:
 - FVWMMFL_SOCKET
 - FVWMMFL_SOCKET_PATH
 
-Note: FvwmMFL is required. If it is not loaded, FVWM functions and the
-right-click menu cannot reach the server (there is no private-socket fallback).
-FvwmTabs no longer creates any private socket or state files; the only socket it
-uses is FvwmMFL's own. The server's lifetime is tied to the FvwmTabs module, so
-nothing is left behind to clean up after FVWM Quit or Restart.
+Note: FvwmMFL is required.
+FvwmTabs does not create any private socket or state files; the only socket it uses is FvwmMFL's own. The server's lifetime is tied to the FvwmTabs module, so nothing is left behind to clean up after FVWM Quit or Restart.
 
 Troubleshooting
 
