@@ -1,7 +1,7 @@
 # FvwmTabs
-It is a generic tabbing module for FVWM that was included in FVWM2. It can swallow any fvwm window and treat it as a tab in a tab-manager window.
+FvwmTabs is a Python/Tk rewrite of the old Perl FVWM tabbing module. It keeps the socket/Tk design, multiple tabbers, FVWM command functions, assigned tabber IDs, right-click menu, and autoSwallow behavior.
 
-This FvwmTabs is a Python/Tk rewrite of the old Perl FVWM tabbing module. This version keeps a stable socket/Tk design: FVWM starts a small client, the client talks to a long-running Python server, and the server reparents selected X11 windows into Tk tabbers.
+FvwmTabs is a single, self-contained executable file. FVWM functions communicate with FvwmTabs through the standard FvwmMFL module, and the FvwmMFL socket client is built into FvwmTabs itself.
 
 # INSTALL and SETUP
 # Requirements
